@@ -1,4 +1,6 @@
 import re
+import phonenumbers
+from phonenumbers import PhoneNumberMatcher
 
 # Rule 1: URL/Link Detection
 def rule1(text: str) -> int:
@@ -111,10 +113,9 @@ def rule3(text: str) -> int:
 
 
 
-# Rule 4: Phone Number Detection
 def rule4(text: str) -> int:
     """
-    Checks if a text contains a mobile phone number.
+    Checks if a text contains a US phone number.
     Returns 1 if a phone number is found, 0 otherwise.
     
     Parameters:
@@ -123,29 +124,23 @@ def rule4(text: str) -> int:
     Returns:
         int: 1 if phone number is found, 0 otherwise
     """
-    # Various phone number patterns to match different formats
-    phone_patterns = [
-        # International format with country code (e.g., +1 123 456 7890, +44-7911-123456)
-        r'(?:\+\d{1,3}[-\.\s]?)?\(?\d{1,4}\)?[-\.\s]?\d{1,4}[-\.\s]?\d{1,9}',
+    # US phone number patterns
+    us_phone_patterns = [
+        # US format with country code (e.g., +1-123-456-7890, +1 (123) 456-7890)
+        r'\+1[-\.\s]?\(?[2-9]\d{2}\)?[-\.\s]?[2-9]\d{2}[-\.\s]?\d{4}',
         
-        # US/Canada format (e.g., (123) 456-7890, 123-456-7890)
-        r'\(?\d{3}\)?[-\.\s]?\d{3}[-\.\s]?\d{4}',
+        # Standard US format (e.g., (123) 456-7890, 123-456-7890, 123.456.7890)
+        r'\(?[2-9]\d{2}\)?[-\.\s]?[2-9]\d{2}[-\.\s]?\d{4}',
         
-        # UK format (e.g., 07911 123456, 07911-123-456)
-        r'0\d{3}[-\.\s]?\d{3}[-\.\s]?\d{3,4}',
+        # US format without separators (e.g., 1234567890) - exactly 10 digits starting with valid area code
+        r'\b[2-9]\d{2}[2-9]\d{6}\b',
         
-        # Generic formats with at least 10 digits
-        r'\b\d{3}[-\.\s]?\d{3}[-\.\s]?\d{4}\b',
-        
-        # Format with separators (e.g., 123.456.7890)
-        r'\d{3}[.\-]\d{3}[.\-]\d{4}',
-        
-        # Simple sequence of digits (e.g., 1234567890) - at least 10 digits but not more than 15
-        r'\b\d{10,15}\b'
+        # 11-digit format starting with 1 (e.g., 11234567890)
+        r'\b1[2-9]\d{2}[2-9]\d{6}\b'
     ]
     
     # Check if any pattern matches the text
-    for pattern in phone_patterns:
+    for pattern in us_phone_patterns:
         if re.search(pattern, text):
             return 1
     
@@ -482,3 +477,11 @@ def rule9(text: str) -> int:
         return 1
     else:
         return 0
+    
+
+'''
+
+TESTING RULESET
+
+
+'''
