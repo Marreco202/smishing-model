@@ -124,44 +124,17 @@ def rule3(text: str) -> int:
     return 0
 
 
-
-# Rule 4: Phone Number Detection
-# def rule4(text: str) -> int:
-#     """
-#     Verifica se uma string de texto contém pelo menos um número de telefone válido.
-
-#     Usa a biblioteca 'phonenumbers' para uma detecção robusta de formatos
-#     nacionais e internacionais.
-
-#     Args:
-#         texto (str): A string de texto a ser analisada.
-
-#     Returns:
-#         int: 1 se um número de telefone for encontrado, 0 caso contrário.
-#     """
-    
-#     for match in PhoneNumberMatcher(text, None):
-#         numero = match.number
-#         if phonenumbers.is_valid_number(numero) and phonenumbers.number_type(numero) in [
-#             phonenumbers.PhoneNumberType.MOBILE,
-#             phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE
-#         ]:
-#             return 1
-#     return 0
-
-
-
 ''
 def rule4(text: str) -> int:
     """
-    Checks if a text contains American or Brazilian phone numbers.
-    Returns 1 if an American or Brazilian phone number is found, 0 otherwise.
+    Checks if a text contains Brazilian phone numbers.
+    Returns 1 if an Brazilian phone number is found, 0 otherwise.
     
     Parameters:
-        text (str): The input text to check for American or Brazilian phone numbers
+        text (str): The input text to check for Brazilian phone numbers
         
     Returns:
-        int: 1 if American or Brazilian phone number is found, 0 otherwise
+        int: 1 if Brazilian phone number is found, 0 otherwise
     """
     # Brazilian mobile phone number patterns
     # Mobile numbers in Brazil start with 9 and have the format:
@@ -185,206 +158,45 @@ def rule4(text: str) -> int:
         # Format with only mobile number: 9XXXX-XXXX or 9 XXXX XXXX (9 digits)
         r'\b9[-\.\s]?\d{4}[-\.\s]?\d{4}\b'
     ]
-    
-    # American phone number patterns
-    # US format: (XXX) XXX-XXXX, XXX-XXX-XXXX, XXX.XXX.XXXX, +1 XXX XXX XXXX
-    # Where first digit of area code is 2-9, first digit of exchange is 2-9
-    
-    american_patterns = [
-        # International format: +1 XXX XXX XXXX or +1 (XXX) XXX-XXXX
-        r'\+1[-\.\s]?\(?[2-9]\d{2}\)?[-\.\s]?[2-9]\d{2}[-\.\s]?\d{4}',
-        
-        # National format with parentheses: (XXX) XXX-XXXX
-        r'\([2-9]\d{2}\)[-\.\s]?[2-9]\d{2}[-\.\s]?\d{4}',
-        
-        # National format with dashes: XXX-XXX-XXXX
-        r'\b[2-9]\d{2}[-\.\s][2-9]\d{2}[-\.\s]\d{4}\b',
-        
-        # Compact format: XXXXXXXXXX (10 digits)
-        # r'\b[2-9]\d{2}[2-9]\d{6}\b'
-    ]
-    
+
     # Check Brazilian patterns
     for pattern in brazilian_patterns:
         if re.search(pattern, text):
-            return 1
-    
-    # Check American patterns
-    for pattern in american_patterns:
-        if re.search(pattern, text):
-            return 1
-    
+            return 1    
     return 0
 
 
 
 
-# Rule 5: Suspicious Words Detection
+# Rule 5: Financial Incentive Words Detection
 def rule5(text: str) -> int:
     """
-    Checks if a text contains suspicious words commonly used in scam or phishing messages.
-    Returns 1 if any suspicious word is found, 0 otherwise.
+    Checks if a text contains financial incentive words commonly used in scam messages.
+    Returns 1 if any financial incentive word is found, 0 otherwise.
     
     Parameters:
-        text (str): The input text to check for suspicious words
+        text (str): The input text to check for financial incentive words
         
     Returns:
-        int: 1 if suspicious words are found, 0 otherwise
+        int: 1 if financial incentive words are found, 0 otherwise
     """
-    # Convert text to lowercase for case-insensitive matching
     text_lower = text.lower()
     
-    # Define suspicious word patterns by category for Brazilian context
-    suspicious_patterns = {
-        # Financial incentives (Portuguese)
-        'financial': [
-            r'\bgratuito\b', r'\bgrátis\b', r'\bganhar\b', r'\bganhou\b', r'\bprêmio[s]?\b', 
-            r'\bdinheiro\b', r'\bpresente[s]?\b', r'\bdesconto\b', r'\bbônus\b', r'\breivindicar\b', 
-            r'\brecompensa[s]?\b', r'\bcrédito[s]?\b', r'\breembolso\b', r'\bpix\b', r'\btransferência\b',
-            r'\b\d+%\s+de\s+desconto\b', r'\beconomize\s+\d+\b', r'\bsortudo\b', r'\bsorteio\b'
-        ],
-        
-        # Urgency words (Portuguese)
-        'urgency': [
-            r'\burgente\b', r'\bimediato\b', r'\brápido\b', r'\búltima\s+chance\b', r'\búltima\s+oportunidade\b',
-            r'\btempo\s+limitado\b', r'\bexpira\b', r'\bexpirando\b', r'\bvence\b', r'\bvencendo\b',
-            r'\bsó\s+hoje\b', r'\bage\s+agora\b', r'\bcorra\b', r'\bprazo\b', r'\bamanhã\b',
-            r'\bhoje\s+mesmo\b', r'\bagora\s+ou\s+nunca\b', r'\bfinal\s+de\s+semana\b'
-        ],
-        
-        # Account-related (Portuguese)
-        'account': [
-            r'\bconta[s]?\b', r'\bsenha[s]?\b', r'\blogin\b', r'\bverificar\b', r'\bsegurança\b',
-            r'\batualizar\b', r'\bconfirmar\b', r'\bvalidar\b', r'\bautenticar\b', r'\bredefinir\b',
-            r'\bsuspensa\b', r'\bbloqueada\b', r'\bdesativada\b', r'\breativar\b', r'\bcpf\b',
-            r'\brg\b', r'\bdados\s+pessoais\b', r'\binformações\s+pessoais\b'
-        ],
-        
-        # Official-sounding terms (Portuguese)
-        'official': [
-            r'\baviso\b', r'\balerta[s]?\b', r'\badvertência[s]?\b', r'\bimportante\b', r'\boficial\b',
-            r'\blegal\b', r'\bgoverno\b', r'\bbanco\b', r'\bimposto[s]?\b', r'\bindenização\b',
-            r'\bautoridade\b', r'\bagência\b', r'\bdepartamento\b', r'\bpagamento[s]?\b',
-            r'\breceita\s+federal\b', r'\bserasa\b', r'\bspc\b', r'\bcaixa\b', r'\bbrasília\b',
-            r'\bministério\b', r'\btribunal\b', r'\bjustiça\b'
-        ],
-        
-        # Call to action (Portuguese)
-        'action': [
-            r'\bclicar\b', r'\bclique\b', r'\bseguir\b', r'\bligar\b', r'\bregistrar\b', r'\binscrever\b',
-            r'\bse\s+inscrever\b', r'\baplicar\b', r'\bbaixar\b', r'\benviar\b', r'\bresponder\b',
-            r'\bcompletar\b', r'\bvisitar\b', r'\bverificar\b', r'\blink\b', r'\bsite\b',
-            r'\binformações\b', r'\bpreencher\b', r'\bcadastrar\b', r'\bconfirme\b'
-        ],
-        
-        # Pressure tactics (Portuguese)
-        'pressure': [
-            r'\bapenas\b', r'\bselecionado\b', r'\bescolhido\b', r'\bexclusivo\b', r'\bespecial\b',
-            r'\bsorte\b', r'\bchance\b', r'\boportunidade\b', r'\brisco\b', r'\bproblema\b',
-            r'\bagora\b', r'\bhoje\b', r'\búltimo\b', r'\búnica\s+vez\b', r'\bfinal\b',
-            r'\bperdendo\b', r'\bperder\b', r'\boferta\s+limitada\b'
-        ],
-        
-        # Common scam phrases (Portuguese)
-        'scam_phrases': [
-            r'\bvocê\s+ganhou\b', r'\bparabéns\b', r'\bloteria\b', r'\bsorteio\s+de\s+prêmios\b',
-            r'\bnão\s+reivindicado\b', r'\boferta\s+única\b', r'\bnegócio\s+exclusivo\b',
-            r'\bverifique\s+sua\s+identidade\b', r'\bacesso\s+negado\b', r'\bconta\s+suspensa\b',
-            r'\bviolação\s+de\s+segurança\b', r'\boferta\s+limitada\b', r'\bdinheiro\s+grátis\b',
-            r'\bresultados\s+garantidos\b', r'\bprêmio\s+em\s+dinheiro\b', r'\bmilionário\b',
-            r'\bconcurso\b', r'\bpromoção\s+especial\b'
-        ],
-
-        # Brazilian-specific terms
-        'brazilian_specific': [
-            r'\bcpf\b', r'\brg\b', r'\bpix\b', r'\bbrasil\b', r'\bbrasileiro\b', r'\breais\b',
-            r'\bbanco\s+do\s+brasil\b', r'\bcaixa\s+econômica\b', r'\bitaú\b', r'\bbradesco\b',
-            r'\bsantander\b', r'\bnubank\b', r'\binter\b', r'\boriginal\b', r'\bbtg\b',
-            r'\bserasa\b', r'\bspc\b', r'\breceita\s+federal\b', r'\binss\b', r'\bfgts\b',
-            r'\bauxi[lí]io\s+emergencial\b', r'\bbolsa\s+família\b', r'\bcpf\s+irregular\b',
-            r'\bnome\s+sujo\b', r'\bscore\b', r'\bnegativado\b', r'\blimpar\s+nome\b',
-            r'\bempréstimo\s+aprovado\b', r'\bcartão\s+de\s+crédito\b', r'\bconsórcio\b'
-        ],
-
-        # Golpes específicos do Brasil
-        'brazilian_scams': [
-            r'\bauxi[lí]io\s+brasil\b',      # Auxílio Brasil
-            r'\bfgts\s+esquecido\b',          # FGTS esquecido  
-            r'\bpis\s+pasep\b',               # PIS/PASEP
-            r'\bimposto\s+de\s+renda\b',      # IR
-            r'\brestituição\b',               # Restituição IR
-            r'\bcadastro\s+positivo\b',       # Cadastro Positivo
-            r'\bregistrato\b',                # Registrato (golpe famoso)
-            r'\bcarteira\s+digital\b',        # Carteiras digitais
-            r'\bpaypal\s+brasil\b',
-            r'\bmercado\s+pago\b',
-            r'\bpicpay\b',
-            r'\brecargapay\b',
-            r'\bchave\s+pix\b',
-            r'\btransfer[eê]ncia\s+pix\b',
-            r'\bpix\s+gr[aá]tis\b'
-        ],
-
-        # Órgãos brasileiros (imitação)
-        'brazilian_institutions': [
-            r'\breceita\s+federal\b',
-            r'\bbanco\s+central\b',
-            r'\bdetran\b',
-            r'\btse\b',                        # TSE
-            r'\btrf\b',                        # TRF
-            r'\binss\b',
-            r'\bcvm\b',                        # CVM
-            r'\bprocon\b',
-            r'\banac\b',                       # ANAC
-            r'\banatel\b',                     # ANATEL
-            r'\bgoverno\s+federal\b',
-            r'\bministério\b',
-            r'\bprefeitura\b'
-        ],
-
-        # Linguagem de golpe brasileiro
-        'brazilian_slang': [
-            r'\bmanda\s+zap\b',
-            r'\bchama\s+no\s+zap\b',
-            r'\bwhatsapp\b',
-            r'\bwpp\b',
-            r'\bzap\b',
-            r'\bmanda\s+msg\b',
-            r'\bfalou\b',
-            r'\bbele[zz]a\b',
-            r'\bmassa\b',
-            r'\btop\b',
-            r'\bshow\b'
-        ]
-    }
-    
-    # Check for suspicious patterns in text
-    for category, patterns in suspicious_patterns.items():
-        for pattern in patterns:
-            if re.search(pattern, text_lower):
-                return 1
-    
-    # Look for combinations of suspicious elements
-    # These are more indicative when found together
-    combinations = [
-        # Urgency + financial (Portuguese)
-        (r'\b(urgente|rápido|agora|hoje)\b.*\b(grátis|dinheiro|prêmio|ganhar)\b', 
-         r'\b(grátis|dinheiro|prêmio|ganhar)\b.*\b(urgente|rápido|agora|hoje)\b'),
-         
-        # Action + account (Portuguese)
-        (r'\b(clicar|ligar|responder)\b.*\b(conta|senha|verificar|cpf)\b',
-         r'\b(conta|senha|verificar|cpf)\b.*\b(clicar|ligar|responder)\b'),
-         
-        # Financial + pressure (Portuguese)
-        (r'\b(dinheiro|grátis|ganhar|prêmio)\b.*\b(apenas|exclusivo|especial|chance)\b',
-         r'\b(apenas|exclusivo|especial|chance)\b.*\b(dinheiro|grátis|ganhar|prêmio)\b')
+    financial_patterns = [
+        r'\bgratuito\b', r'\bgrátis\b', r'\bganhar\b', r'\bganhou\b', r'\bprêmio[s]?\b', 
+        r'\bdinheiro\b', r'\bpresente[s]?\b', r'\bdesconto\b', r'\bbônus\b', r'\breivindicar\b', 
+        r'\brecompensa[s]?\b', r'\bcrédito[s]?\b', r'\breembolso\b', r'\bpix\b', r'\btransferência\b',
+        r'\b\d+%\s+de\s+desconto\b', r'\beconomize\s+\d+\b', r'\bsortudo\b', r'\bsorteio\b'
     ]
     
-    for pair in combinations:
-        if re.search(pair[0], text_lower) or re.search(pair[1], text_lower):
+    for pattern in financial_patterns:
+        if re.search(pattern, text_lower):
             return 1
     
     return 0
+
+
+
 
 
 
@@ -400,10 +212,8 @@ def rule6(text: str) -> int:
     Returns:
         int: 1 if text is too long, 0 otherwise
     """
-    # Define threshold for message length (180 characters)
-    # SMS smishing attempts often use longer messages to make sophisticated scams
-    # Portuguese tends to be more verbose than English, so increased threshold
-    threshold_length = 180
+    
+    threshold_length = 200
     
     # Check if the message length exceeds the threshold
     if len(text) > threshold_length:
@@ -663,9 +473,230 @@ def rule9(text: str) -> int:
         return 0
     
 
-'''
+# Rule 10: Urgency Words Detection
+def rule10(text: str) -> int:
+    """
+    Checks if a text contains urgency words that create pressure.
+    Returns 1 if any urgency word is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for urgency words
+        
+    Returns:
+        int: 1 if urgency words are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    urgency_patterns = [
+        r'\burgente\b', r'\bimediato\b', r'\brápido\b', r'\búltima\s+chance\b', r'\búltima\s+oportunidade\b',
+        r'\btempo\s+limitado\b', r'\bexpira\b', r'\bexpirando\b', r'\bvence\b', r'\bvencendo\b',
+        r'\bsó\s+hoje\b', r'\bage\s+agora\b', r'\bcorra\b', r'\bprazo\b', r'\bamanhã\b',
+        r'\bhoje\s+mesmo\b', r'\bagora\s+ou\s+nunca\b', r'\bfinal\s+de\s+semana\b'
+    ]
+    
+    for pattern in urgency_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
 
-TESTING RULESET
+
+# Rule 11: Account Security Words Detection
+def rule11(text: str) -> int:
+    """
+    Checks if a text contains account-related security words.
+    Returns 1 if any account security word is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for account security words
+        
+    Returns:
+        int: 1 if account security words are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    account_patterns = [
+        r'\bconta[s]?\b', r'\bsenha[s]?\b', r'\blogin\b', r'\bverificar\b', r'\bsegurança\b',
+        r'\batualizar\b', r'\bconfirmar\b', r'\bvalidar\b', r'\bautenticar\b', r'\bredefinir\b',
+        r'\bsuspensa\b', r'\bbloqueada\b', r'\bdesativada\b', r'\breativar\b', r'\bcpf\b',
+        r'\brg\b', r'\bdados\s+pessoais\b', r'\binformações\s+pessoais\b'
+    ]
+    
+    for pattern in account_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
 
 
-'''
+# Rule 12: Official Authority Words Detection
+def rule12(text: str) -> int:
+    """
+    Checks if a text contains official-sounding authority words.
+    Returns 1 if any official authority word is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for official authority words
+        
+    Returns:
+        int: 1 if official authority words are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    official_patterns = [
+        r'\baviso\b', r'\balerta[s]?\b', r'\badvertência[s]?\b', r'\bimportante\b', r'\boficial\b',
+        r'\blegal\b', r'\bgoverno\b', r'\bbanco\b', r'\bimposto[s]?\b', r'\bindenização\b',
+        r'\bautoridade\b', r'\bagência\b', r'\bdepartamento\b', r'\bpagamento[s]?\b',
+        r'\breceita\s+federal\b', r'\bserasa\b', r'\bspc\b', r'\bcaixa\b', r'\bbrasília\b',
+        r'\bministério\b', r'\btribunal\b', r'\bjustiça\b'
+    ]
+    
+    for pattern in official_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
+
+
+# Rule 13: Call to Action Words Detection
+def rule13(text: str) -> int:
+    """
+    Checks if a text contains call-to-action words that prompt immediate response.
+    Returns 1 if any call-to-action word is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for call-to-action words
+        
+    Returns:
+        int: 1 if call-to-action words are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    action_patterns = [
+        r'\bclicar\b', r'\bclique\b', r'\bseguir\b', r'\bligar\b', r'\bregistrar\b', r'\binscrever\b',
+        r'\bse\s+inscrever\b', r'\baplicar\b', r'\bbaixar\b', r'\benviar\b', r'\bresponder\b',
+        r'\bcompletar\b', r'\bvisitar\b', r'\bverificar\b', r'\blink\b', r'\bsite\b',
+        r'\binformações\b', r'\bpreencher\b', r'\bcadastrar\b', r'\bconfirme\b'
+    ]
+    
+    for pattern in action_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
+
+
+# Rule 14: Brazilian Specific Scam Terms Detection
+def rule14(text: str) -> int:
+    """
+    Checks if a text contains Brazilian-specific scam terms and institutions.
+    Returns 1 if any Brazilian-specific scam term is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for Brazilian-specific scam terms
+        
+    Returns:
+        int: 1 if Brazilian-specific scam terms are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    brazilian_patterns = [
+        # Brazilian financial institutions
+        r'\bbanco\s+do\s+brasil\b', r'\bcaixa\s+econômica\b', r'\bitaú\b', r'\bbradesco\b',
+        r'\bsantander\b', r'\bnubank\b', r'\binter\b', r'\boriginal\b', r'\bbtg\b',
+        
+        # Brazilian government programs
+        r'\bauxi[lí]io\s+emergencial\b', r'\bbolsa\s+família\b', r'\bauxi[lí]io\s+brasil\b',
+        r'\bfgts\s+esquecido\b', r'\bpis\s+pasep\b', r'\bimposto\s+de\s+renda\b',
+        r'\brestituição\b', r'\bcadastro\s+positivo\b',
+        
+        # Brazilian credit/financial terms
+        r'\bcpf\s+irregular\b', r'\bnome\s+sujo\b', r'\bscore\b', r'\bnegativado\b',
+        r'\blimpar\s+nome\b', r'\bempréstimo\s+aprovado\b', r'\bcartão\s+de\s+crédito\b',
+        r'\bconsórcio\b', r'\bchave\s+pix\b', r'\btransfer[eê]ncia\s+pix\b',
+        
+        # Brazilian institutions
+        r'\breceita\s+federal\b', r'\bbanco\s+central\b', r'\bdetran\b', r'\btse\b',
+        r'\binss\b', r'\bprocon\b', r'\bgoverno\s+federal\b'
+    ]
+    
+    for pattern in brazilian_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
+
+
+# Rule 15: Pressure Tactics Detection
+def rule15(text: str) -> int:
+    """
+    Checks if a text contains pressure tactics and exclusivity claims.
+    Returns 1 if any pressure tactic is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for pressure tactics
+        
+    Returns:
+        int: 1 if pressure tactics are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    pressure_patterns = [
+        r'\bapenas\b', r'\bselecionado\b', r'\bescolhido\b', r'\bexclusivo\b', r'\bespecial\b',
+        r'\bsorte\b', r'\bchance\b', r'\boportunidade\b', r'\brisco\b', r'\bproblema\b',
+        r'\bagora\b', r'\bhoje\b', r'\búltimo\b', r'\búnica\s+vez\b', r'\bfinal\b',
+        r'\bperdendo\b', r'\bperder\b', r'\boferta\s+limitada\b', r'\bparabéns\b',
+        r'\bvocê\s+ganhou\b', r'\bloteria\b', r'\bsorteio\s+de\s+prêmios\b',
+        r'\bnão\s+reivindicado\b', r'\boferta\s+única\b', r'\bnegócio\s+exclusivo\b'
+    ]
+    
+    for pattern in pressure_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
+
+
+# Rule 16: Suspicious Word Combinations Detection
+def rule16(text: str) -> int:
+    """
+    Checks if a text contains suspicious combinations of words that are more indicative
+    of scam messages when found together.
+    Returns 1 if any suspicious combination is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for suspicious word combinations
+        
+    Returns:
+        int: 1 if suspicious word combinations are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    # Look for combinations of suspicious elements
+    combinations = [
+        # Urgency + financial (Portuguese)
+        r'\b(urgente|rápido|agora|hoje)\b.*\b(grátis|dinheiro|prêmio|ganhar)\b',
+        r'\b(grátis|dinheiro|prêmio|ganhar)\b.*\b(urgente|rápido|agora|hoje)\b',
+         
+        # Action + account (Portuguese)
+        r'\b(clicar|ligar|responder)\b.*\b(conta|senha|verificar|cpf)\b',
+        r'\b(conta|senha|verificar|cpf)\b.*\b(clicar|ligar|responder)\b',
+         
+        # Financial + pressure (Portuguese)
+        r'\b(dinheiro|grátis|ganhar|prêmio)\b.*\b(apenas|exclusivo|especial|chance)\b',
+        r'\b(apenas|exclusivo|especial|chance)\b.*\b(dinheiro|grátis|ganhar|prêmio)\b',
+        
+        # Official + urgent (Portuguese)
+        r'\b(banco|governo|receita|oficial)\b.*\b(urgente|imediato|agora)\b',
+        r'\b(urgente|imediato|agora)\b.*\b(banco|governo|receita|oficial)\b',
+        
+        # Prize + action (Portuguese)
+        r'\b(ganhou|prêmio|sorteio|parabéns)\b.*\b(clicar|ligar|responder|confirmar)\b',
+        r'\b(clicar|ligar|responder|confirmar)\b.*\b(ganhou|prêmio|sorteio|parabéns)\b'
+    ]
+    
+    for pattern in combinations:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
