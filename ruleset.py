@@ -148,109 +148,33 @@ def rule4(text: str) -> int:
 
 
 
-# Rule 5: Suspicious Words Detection
+# Rule 5: Financial Incentive Words Detection
 def rule5(text: str) -> int:
     """
-    Checks if a text contains suspicious words commonly used in scam or phishing messages.
-    Returns 1 if any suspicious word is found, 0 otherwise.
+    Checks if a text contains financial incentive words commonly used in scam messages.
+    Returns 1 if any financial incentive word is found, 0 otherwise.
     
     Parameters:
-        text (str): The input text to check for suspicious words
+        text (str): The input text to check for financial incentive words
         
     Returns:
-        int: 1 if suspicious words are found, 0 otherwise
+        int: 1 if financial incentive words are found, 0 otherwise
     """
-    # Convert text to lowercase for case-insensitive matching
     text_lower = text.lower()
     
-    # Define suspicious word patterns by category
-    suspicious_patterns = {
-        # Financial incentives
-        'financial': [
-            r'\bfree\b', r'\bwin\b', r'\bwon\b', r'\bprize[s]?\b', r'\bcash\b', r'\bmoney\b', 
-            r'\bgift[s]?\b', r'\bdiscount\b', r'\bbonus\b', r'\bclaim\b', r'\breward[s]?\b', 
-            r'\bcredit[s]?\b', r'\brefund\b', r'\b\d+%\s+off\b', r'\bsave\s+\d+\b'
-        ],
-        
-        # Urgency words
-        'urgency': [
-            r'\burgent\b', r'\bimmediate\b', r'\bquick\b', r'\blast\s+chance\b', 
-            r'\blimited\s+time\b', r'\bexpires?\b', r'\bexpiring\b', r'\btoday\s+only\b', 
-            r'\bact\s+now\b', r'\bhurry\b', r'\bdeadline\b', r'\btomorrow\b'
-        ],
-        
-        # Account-related
-        'account': [
-            r'\baccount[s]?\b', r'\bpassword[s]?\b', r'\blogin\b', r'\bverify\b', r'\bsecurity\b', 
-            r'\bupdate[s]?\b', r'\bconfirm\b', r'\bvalidate\b', r'\bauthenticate\b', r'\breset\b', 
-            r'\bsuspended\b', r'\block[ed]?\b', r'\bdeactivate[d]?\b', r'\breactivate\b'
-        ],
-        
-        # Official-sounding terms
-        'official': [
-            r'\bnotice\b', r'\balert[s]?\b', r'\bwarning[s]?\b', r'\bimportant\b', r'\bofficial\b', 
-            r'\blegal\b', r'\bgovernment\b', r'\bbank\b', r'\btax[es]?\b', r'\bcompensation\b',
-            r'\bauthority\b', r'\bagency\b', r'\bdepartment\b', r'\bpayment[s]?\b'
-        ],
-        
-        # Call to action
-        'action': [
-            r'\bclick\b', r'\bfollow\b', r'\bcall\b', r'\bregister\b', r'\bsubscribe\b', r'\bapply\b',
-            r'\bdownload\b', r'\bsubmit\b', r'\breply\b', r'\brespond\b', r'\bcomplete\b', r'\bvisit\b',
-            r'\bcheck\b', r'\blink\b', r'\burl\b', r'\bwebsite\b', r'\binfo[rmation]?\b'
-        ],
-        
-        # Pressure tactics
-        'pressure': [
-            r'\bonly\b', r'\bselected\b', r'\bchosen\b', r'\bexclusive\b', r'\bspecial\b',
-            r'\blucky\b', r'\bchance\b', r'\bopportunity\b', r'\brisk\b', r'\bproblem\b',
-            r'\bnow\b', r'\btoday\b', r'\blast\b', r'\bone\s+time\b', r'\bfinal\b'
-        ],
-        
-        # Common scam phrases
-        'scam_phrases': [
-            r'\byou\s+have\s+won\b', r'\bcongratulations\b', r'\blottery\b', r'\bprize\s+draw\b',
-            r'\bunclaimed\b', r'\bunique\s+offer\b', r'\bexclusive\s+deal\b', r'\bverify\s+your\s+identity\b',
-            r'\baccess\s+denied\b', r'\baccount\s+suspended\b', r'\bsecurity\s+breach\b',
-            r'\blimited\s+offer\b', r'\bfree\s+money\b', r'\bguaranteed\s+results\b'
-        ],
-
-        # Common scam phrases from paper
-        'paper_phrases': [
-            r'\bfree\b', r'\baccident\b', r'\bawards\b', r'\bdating\b', r'\bwon\b', r'\bservice\b',
-            r'\blottery\b',r'\bmins\b',r'\bfree\b',r'\bvisit\b',r'\bdelivery\b',r'\bcash\b',r'\bclaim\b',r'\bprize\b',
-            r'\bdelivery\b'
-        ]
-    }
-    
-    # Check for suspicious patterns in text
-    for category, patterns in suspicious_patterns.items():
-        for pattern in patterns:
-            if re.search(pattern, text_lower):
-                return 1
-    
-    # Look for combinations of suspicious elements
-    # These are more indicative when found together
-    combinations = [
-        # Urgency + financial
-        (r'\b(urgent|quick|hurry|now)\b.*\b(free|money|cash|prize|win)\b', 
-         r'\b(free|money|cash|prize|win)\b.*\b(urgent|quick|hurry|now)\b'),
-         
-        # Action + account
-        (r'\b(click|call|reply)\b.*\b(account|password|login|verify)\b',
-         r'\b(account|password|login|verify)\b.*\b(click|call|reply)\b'),
-         
-        # Financial + pressure
-        (r'\b(money|cash|free|win)\b.*\b(only|exclusive|special|chance)\b',
-         r'\b(only|exclusive|special|chance)\b.*\b(money|cash|free|win)\b')
+    financial_patterns = [
+        r'\bfree\b', r'\bwin\b', r'\bwon\b', r'\bprize[s]?\b', r'\bcash\b', r'\bmoney\b', 
+        r'\bgift[s]?\b', r'\bdiscount\b', r'\bbonus\b', r'\bclaim\b', r'\breward[s]?\b', 
+        r'\bcredit[s]?\b', r'\brefund\b', r'\b\d+%\s+off\b', r'\bsave\s+\d+\b',
+        r'\bfree\s+money\b', r'\bunique\s+offer\b', r'\bexclusive\s+deal\b',
+        r'\blimited\s+offer\b', r'\bguaranteed\s+results\b'
     ]
     
-    for pair in combinations:
-        if re.search(pair[0], text_lower) or re.search(pair[1], text_lower):
+    for pattern in financial_patterns:
+        if re.search(pattern, text_lower):
             return 1
     
     return 0
-
 
 
 # Rule 6: Message Length Detection
@@ -478,10 +402,164 @@ def rule9(text: str) -> int:
     else:
         return 0
     
+# Rule 10: Urgency Words Detection  
+def rule10(text: str) -> int:
+    """
+    Checks if a text contains urgency words that create time pressure.
+    Returns 1 if any urgency word is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for urgency words
+        
+    Returns:
+        int: 1 if urgency words are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    urgency_patterns = [
+        r'\burgent\b', r'\bimmediate\b', r'\bquick\b', r'\blast\s+chance\b', 
+        r'\blimited\s+time\b', r'\bexpires?\b', r'\bexpiring\b', r'\btoday\s+only\b', 
+        r'\bact\s+now\b', r'\bhurry\b', r'\bdeadline\b', r'\btomorrow\b',
+        r'\bnow\b', r'\btoday\b', r'\blast\b', r'\bone\s+time\b', r'\bfinal\b'
+    ]
+    
+    for pattern in urgency_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
 
-'''
 
-TESTING RULESET
+# Rule 11: Account-Related Suspicious Words Detection
+def rule11(text: str) -> int:
+    """
+    Checks if a text contains account-related suspicious words.
+    Returns 1 if any account-related suspicious word is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for account-related words
+        
+    Returns:
+        int: 1 if account-related suspicious words are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    account_patterns = [
+        r'\baccount[s]?\b', r'\bpassword[s]?\b', r'\blogin\b', r'\bverify\b', r'\bsecurity\b', 
+        r'\bupdate[s]?\b', r'\bconfirm\b', r'\bvalidate\b', r'\bauthenticate\b', r'\breset\b', 
+        r'\bsuspended\b', r'\block[ed]?\b', r'\bdeactivate[d]?\b', r'\breactivate\b',
+        r'\bverify\s+your\s+identity\b', r'\baccess\s+denied\b', r'\baccount\s+suspended\b', 
+        r'\bsecurity\s+breach\b'
+    ]
+    
+    for pattern in account_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
 
 
-'''
+# Rule 12: Official-Sounding Terms Detection
+def rule12(text: str) -> int:
+    """
+    Checks if a text contains official-sounding terms used to appear legitimate.
+    Returns 1 if any official-sounding term is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for official-sounding terms
+        
+    Returns:
+        int: 1 if official-sounding terms are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    official_patterns = [
+        r'\bnotice\b', r'\balert[s]?\b', r'\bwarning[s]?\b', r'\bimportant\b', r'\bofficial\b', 
+        r'\blegal\b', r'\bgovernment\b', r'\bbank\b', r'\btax[es]?\b', r'\bcompensation\b',
+        r'\bauthority\b', r'\bagency\b', r'\bdepartment\b', r'\bpayment[s]?\b'
+    ]
+    
+    for pattern in official_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
+
+
+# Rule 13: Call-to-Action Words Detection
+def rule13(text: str) -> int:
+    """
+    Checks if a text contains call-to-action words that prompt user interaction.
+    Returns 1 if any call-to-action word is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for call-to-action words
+        
+    Returns:
+        int: 1 if call-to-action words are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    action_patterns = [
+        r'\bclick\b', r'\bfollow\b', r'\bcall\b', r'\bregister\b', r'\bsubscribe\b', r'\bapply\b',
+        r'\bdownload\b', r'\bsubmit\b', r'\breply\b', r'\brespond\b', r'\bcomplete\b', r'\bvisit\b',
+        r'\bcheck\b', r'\blink\b', r'\burl\b', r'\bwebsite\b', r'\binfo[rmation]?\b'
+    ]
+    
+    for pattern in action_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
+
+
+# Rule 14: Pressure Tactics Words Detection
+def rule14(text: str) -> int:
+    """
+    Checks if a text contains pressure tactics words used to manipulate recipients.
+    Returns 1 if any pressure tactics word is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for pressure tactics words
+        
+    Returns:
+        int: 1 if pressure tactics words are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    pressure_patterns = [
+        r'\bonly\b', r'\bselected\b', r'\bchosen\b', r'\bexclusive\b', r'\bspecial\b',
+        r'\blucky\b', r'\bchance\b', r'\bopportunity\b', r'\brisk\b', r'\bproblem\b'
+    ]
+    
+    for pattern in pressure_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
+    return 0
+
+
+# Rule 15: Common Scam Phrases Detection
+def rule15(text: str) -> int:
+    """
+    Checks if a text contains common scam phrases from research literature.
+    Returns 1 if any common scam phrase is found, 0 otherwise.
+    
+    Parameters:
+        text (str): The input text to check for common scam phrases
+        
+    Returns:
+        int: 1 if common scam phrases are found, 0 otherwise
+    """
+    text_lower = text.lower()
+    
+    scam_patterns = [
+        r'\byou\s+have\s+won\b', r'\bcongratulations\b', r'\blottery\b', r'\bprize\s+draw\b',
+        r'\bunclaimed\b', r'\baccident\b', r'\bawards\b', r'\bdating\b', r'\bservice\b',
+        r'\bmins\b', r'\bdelivery\b'
+    ]
+    
+    for pattern in scam_patterns:
+        if re.search(pattern, text_lower):
+            return 1
+    
