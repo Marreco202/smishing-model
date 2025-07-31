@@ -14,8 +14,6 @@ def rule1(text: str) -> int:
     Returns:
         int: 1 if URL is found, 0 otherwise
     """
-    # Comprehensive URL pattern to catch various formats
-    # Including common TLDs, shortened URLs, and URLs without protocol
     url_pattern = re.compile(r'''
         (https?://)?                               # Optional protocol (http:// or https://)
         (www\.)?                                   # Optional www
@@ -185,8 +183,16 @@ def rule5(text: str) -> int:
     financial_patterns = [
         r'\bgratuito\b', r'\bgrátis\b', r'\bganhar\b', r'\bganhou\b', r'\bprêmio[s]?\b', 
         r'\bdinheiro\b', r'\bpresente[s]?\b', r'\bdesconto\b', r'\bbônus\b', r'\breivindicar\b', 
-        r'\brecompensa[s]?\b', r'\bcrédito[s]?\b', r'\breembolso\b', r'\bpix\b', r'\btransferência\b',
-        r'\b\d+%\s+de\s+desconto\b', r'\beconomize\s+\d+\b', r'\bsortudo\b', r'\bsorteio\b'
+        r'\brecompensa[s]?\b', r'\bcrédito[s]?\b', r'\breembolso\b', r'\btransferência\b',
+        r'\b\d+%\s+de\s+desconto\b', r'\beconomize\s+\d+\b', r'\bsortudo\b', r'\bsorteio\b',
+        
+        # PIX patterns - mais específicos para contextos suspeitos
+        r'\bpix\s+(grátis|gratuito)\b',  # "PIX grátis"
+        r'\benvie\s+pix\b', r'\bmande\s+pix\b', r'\bfaça\s+pix\b',  # "envie PIX", "mande PIX"
+        r'\bpix\s+de\s+R?\$?\s*\d+', r'\bR?\$?\s*\d+\s+via\s+pix\b',  # "PIX de R$ 100", "R$ 50 via PIX"
+        r'\bpix\s+(para|pra)\s+(receber|ganhar|resgatar)\b',  # "PIX para receber", "PIX pra ganhar"
+        r'\bchave\s+pix\s+(seu|sua|minha)\b',  # "chave PIX seu/sua"
+        r'\bconfirme\s+pix\b', r'\bvalide\s+pix\b'  # "confirme PIX", "valide PIX"
     ]
     
     for pattern in financial_patterns:
@@ -212,10 +218,9 @@ def rule6(text: str) -> int:
     Returns:
         int: 1 if text is too long, 0 otherwise
     """
-    
+
     threshold_length = 200
     
-    # Check if the message length exceeds the threshold
     if len(text) > threshold_length:
         return 1
     else:
@@ -237,10 +242,10 @@ def rule7(text: str) -> int:
     Returns:
         int: 1 if self-answering patterns are found, 0 otherwise
     """
-    # Convert to lowercase for case-insensitive matching
+    
     text_lower = text.lower()
     
-    # Define patterns for self-answering techniques (Brazilian Portuguese)
+    
     self_answering_patterns = [
         # Question followed by immediate answer (Portuguese)
         r'\b(você|voce) (quer|precisa|tem|está|esta|gostaria|poderia).*\?\s*(sim|não|nao|claro|óbvio)',
@@ -342,8 +347,7 @@ def rule8(text: str) -> int:
     Returns:
         int: 1 if visual morphemes are found, 0 otherwise
     """
-    # Convert to lowercase for consistent pattern matching
-    # (but keep a copy of original text for case-based patterns)
+
     text_lower = text.lower()
     
     # 1. Check for excessive use of uppercase (shouting)
@@ -613,7 +617,7 @@ def rule14(text: str) -> int:
         # Brazilian credit/financial terms
         r'\bcpf\s+irregular\b', r'\bnome\s+sujo\b', r'\bscore\b', r'\bnegativado\b',
         r'\blimpar\s+nome\b', r'\bempréstimo\s+aprovado\b', r'\bcartão\s+de\s+crédito\b',
-        r'\bconsórcio\b', r'\bchave\s+pix\b', r'\btransfer[eê]ncia\s+pix\b',
+        r'\bconsórcio\b', r'\bchave\s+pix\b', r'\btransfer[eê]ncia\s+pix\b', r'\bpix\b',
         
         # Brazilian institutions
         r'\breceita\s+federal\b', r'\bbanco\s+central\b', r'\bdetran\b', r'\btse\b',
